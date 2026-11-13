@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>중2 과학 가상실험: 광원으로부터의 거리에 따른 빛의 세기</title>
+    <!-- Tailwind CSS 로드 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Noto Sans KR & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100dvh;
+            width: 100vw;
+            overflow: hidden;
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .font-mono-num {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        #labCanvas {
+            touch-action: none;
+        }
+        /* 숫자 입력창 화살표 제거 */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        .toast-enter {
+            animation: slideInUp 0.3s ease-out forwards;
+        }
+        .toast-leave {
+            animation: fadeOut 0.3s ease-in forwards;
+        }
+        @keyframes slideInUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+    </style>
+</head>
+<body class="flex flex-col h-[100dvh] overflow-hidden">
+
+    <!-- 상단 네비게이션 및 4단계 탭 바 -->
+    <header class="bg-slate-900 text-white shadow-md shrink-0 z-30">
+        <div class="max-w-7xl mx-auto px-3 sm:px-5 h-14 flex items-center justify-between gap-2">
+            <!-- 좌측 타이틀 -->
+            <div class="flex items-center gap-2.5 shrink-0">
+                <div class="bg-amber-400 text-slate-950 px-2.5 py-1 rounded-xl font-black text-sm shadow-inner flex items-center gap-1">
+                    <span>💡</span>
+                    <span class="hidden sm:inline">중2 과학</span>
+                </div>
+                <div>
+                    <h1 class="text-sm sm:text-base font-bold tracking-tight leading-tight">광원으로부터의 거리에 따른 빛의 세기</h1>
+                </div>
+            </div>
+
+            <!-- 중앙 4단계 탭 네비게이션 -->
+            <nav class="flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700 gap-1" role="tablist">
+                <button onclick="switchTab(1)" id="tabBtn1" class="tab-btn px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-indigo-600 text-white shadow">
+                    <span id="tabBadge1" class="w-4 h-4 rounded-full bg-white/20 text-[11px] flex items-center justify-center">1</span>
+                    <span class="hidden md:inline">준비 & 방법</span>
+                </button>
+                <button onclick="switchTab(2)" id="tabBtn2" class="tab-btn px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white">
+                    <span id="tabBadge2" class="w-4 h-4 rounded-full bg-slate-700 text-[11px] flex items-center justify-center">2</span>
+                    <span class="hidden md:inline">가상 실험실</span>
+                </button>
+                <button onclick="switchTab(3)" id="tabBtn3" class="tab-btn px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white">
+                    <span id="tabBadge3" class="w-4 h-4 rounded-full bg-slate-700 text-[11px] flex items-center justify-center">3</span>
+                    <span class="hidden md:inline">표 & 계산하기</span>
+                </button>
+                <button onclick="switchTab(4)" id="tabBtn4" class="tab-btn px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white">
+                    <span id="tabBadge4" class="w-4 h-4 rounded-full bg-slate-700 text-[11px] flex items-center justify-center">4</span>
+                    <span class="hidden md:inline">그래프</span>
+                </button>
+                <button onclick="switchTab(5)" id="tabBtn5" class="tab-btn px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white">
+                    <span id="tabBadge5" class="w-4 h-4 rounded-full bg-slate-700 text-[11px] flex items-center justify-center">5</span>
+                    <span class="hidden md:inline">정리 & 퀴즈</span>
+                </button>
+            </nav>
+
+            <!-- 우측 초기화 버튼 -->
+            <button onclick="resetAllExperiment()" class="bg-rose-600 hover:bg-rose-500 active:scale-95 transition text-white text-xs font-bold px-3 py-1.5 rounded-xl flex items-center gap-1 shrink-0 shadow">
+                <span>🔄</span>
+                <span class="hidden md:inline">초기화</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- 토스트 메시지 영역 (alert 대체) -->
+    <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-1.5 pointer-events-none"></div>
+
+    <!-- 메인 콘텐츠 영역 -->
+    <main class="flex-1 min-h-0 max-w-7xl w-full mx-auto p-2.5 sm:p-4 flex flex-col relative">
+
+        <!-- =====================================================================
+             [1단계] 준비 & 방법 탭
+             ===================================================================== -->
+        <section id="tabPanel1" class="tab-panel flex-1 min-h-0 grid grid-cols-12 gap-3 sm:gap-4">
+            <!-- 좌측: 실험 준비물 & 주의사항 -->
+            <div class="col-span-12 md:col-span-5 bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex flex-col justify-between min-h-0 overflow-y-auto">
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2 border-b border-slate-100 pb-2">
+                        <span class="text-xl">🧰</span>
+                        <h2 class="font-bold text-slate-800 text-base sm:text-lg">실험 준비물</h2>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col items-center text-center gap-1">
+                            <span class="text-2xl">📱</span>
+                            <span class="font-bold text-slate-800 text-xs sm:text-sm">스마트 기기</span>
+                            <span class="text-[11px] text-slate-500">조도 센서 앱 실행 (0.0 m 고정)</span>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col items-center text-center gap-1">
+                            <span class="text-2xl">💡</span>
+                            <span class="font-bold text-slate-800 text-xs sm:text-sm">전구</span>
+                            <span class="text-[11px] text-slate-500">일정한 밝기를 내는 광원</span>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col items-center text-center gap-1">
+                            <span class="text-2xl">🗼</span>
+                            <span class="font-bold text-slate-800 text-xs sm:text-sm">갓 없는 스탠드</span>
+                            <span class="text-[11px] text-slate-500">빛을 한쪽으로 모으지 않음</span>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col items-center text-center gap-1">
+                            <span class="text-2xl">📏</span>
+                            <span class="font-bold text-slate-800 text-xs sm:text-sm">줄자 (2.0 m)</span>
+                            <span class="text-[11px] text-slate-500">0.5 m 간격으로 거리 측정</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-950 leading-relaxed">
+                        <p class="font-bold mb-1 flex items-center gap-1">
+                            <span>💡</span> 왜 '갓 없는 스탠드'를 사용할까요?
+                        </p>
+                        <p>전등 갓이 있으면 반사된 빛이 한쪽으로 모여 거리만 변할 때의 순수한 빛의 퍼짐을 정확히 측정할 수 없기 때문입니다.</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 text-slate-200 rounded-xl p-3 text-xs flex items-center gap-2.5 mt-3">
+                    <span class="text-lg">🌑</span>
+                    <span>다른 조명의 방해를 막기 위해 가상 실험실은 <b>암실</b>로 설정되어 있습니다.</span>
+                </div>
+            </div>
+
+            <!-- 우측: 실험 과정 안내 및 시작 버튼 -->
+            <div class="col-span-12 md:col-span-7 bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex flex-col justify-between min-h-0 overflow-y-auto">
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2 border-b border-slate-100 pb-2">
+                        <span class="text-xl">📋</span>
+                        <h2 class="font-bold text-slate-800 text-base sm:text-lg">탐구 실험 순서</h2>
+                    </div>
+
+                    <div class="space-y-2.5">
+                        <div class="flex items-start gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200/80">
+                            <span class="w-6 h-6 rounded-full bg-indigo-600 text-white font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">1</span>
+                            <div class="text-xs sm:text-sm text-slate-700 leading-snug">
+                                <b class="text-slate-900">전구 설치 및 전원 켜기:</b> 스마트 기기로부터의 거리가 <b class="text-indigo-600">0.5 m</b>가 되게 갓 없는 스탠드 전구를 설치하고 전원을 켭니다.
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200/80">
+                            <span class="w-6 h-6 rounded-full bg-indigo-600 text-white font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">2</span>
+                            <div class="text-xs sm:text-sm text-slate-700 leading-snug">
+                                <b class="text-slate-900">0.5 m씩 멀어지며 측정하기:</b> 전구를 <b class="text-indigo-600">0.5 m, 1.0 m, 1.5 m, 2.0 m</b> 위치로 0.5 m씩 이동시키며 스마트 기기에 측정된 <b>빛의 세기(lx)</b>를 기록합니다.
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200/80">
+                            <span class="w-6 h-6 rounded-full bg-indigo-600 text-white font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">3</span>
+                            <div class="text-xs sm:text-sm text-slate-700 leading-snug">
+                                <b class="text-slate-900">계산 및 규칙 발견하기:</b> <b class="text-emerald-700">거리의 제곱(d²)</b>을 직접 구해보고, <b class="text-purple-700">빛의 세기 × 거리의 제곱(I × d²)</b> 값을 클릭해 계산하면서 어떤 규칙이 있는지 확인합니다.
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200/80">
+                            <span class="w-6 h-6 rounded-full bg-indigo-600 text-white font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">4</span>
+                            <div class="text-xs sm:text-sm text-slate-700 leading-snug">
+                                <b class="text-slate-900">그래프 해석 및 생활 속 원리 적용:</b> 측정 결과 그래프로 관계를 이해하고, 실생활 속 빛의 세기 현상을 설명해 봅니다.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 mt-auto">
+                    <button onclick="switchTab(2)" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 active:scale-99 text-white font-bold text-sm sm:text-base rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                        <span>🔬</span>
+                        <span>2단계: 가상 실험실로 이동하여 측정 시작하기</span>
+                        <span>▶</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- =====================================================================
+             [2단계] 가상 실험실 탭
+             ===================================================================== -->
+        <section id="tabPanel2" class="tab-panel hidden flex-1 min-h-0 grid grid-cols-12 gap-3 sm:gap-4">
+            <!-- 좌측: 암실 실험 무대 + 거리 조절 바 -->
+            <div class="col-span-12 md:col-span-8 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col min-h-0">
+                <div class="px-3.5 py-2 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-2 shrink-0">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <h2 class="font-bold text-slate-800 text-xs sm:text-sm">암실 실험대 (0.0 m ~ 2.0 m)</h2>
+                    </div>
+                    <label class="flex items-center gap-1.5 cursor-pointer bg-white px-2.5 py-1 rounded-lg border border-slate-200 text-xs">
+                        <input type="checkbox" id="showRaysToggle" checked onchange="drawLab()" class="accent-amber-500 w-3.5 h-3.5 rounded">
+                        <span class="font-medium text-slate-700">빛의 퍼짐 보기</span>
+                    </label>
+                </div>
+
+                <div class="relative flex-1 min-h-0 bg-slate-950 w-full" id="labContainer">
+                    <canvas id="labCanvas" class="w-full h-full block cursor-ew-resize"></canvas>
+                    
+                    <div class="absolute top-2.5 left-3 flex items-center gap-2 pointer-events-none">
+                        <span id="bulbStatusBadge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-800/90 text-slate-400 border border-slate-700">
+                            전구 상태: OFF (꺼짐)
+                        </span>
+                        <span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-800/80 text-sky-300 border border-slate-700 hidden sm:inline">
+                            전구를 좌우로 드래그하여 이동
+                        </span>
+                    </div>
+                </div>
+
+                <div class="p-2.5 sm:p-3 bg-slate-50 border-t border-slate-200 shrink-0 flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="changeDistance(-0.5)" id="btnMinus" disabled class="px-2.5 py-2 bg-white hover:bg-slate-100 active:scale-95 disabled:opacity-40 border border-slate-300 rounded-xl font-bold text-slate-700 text-xs sm:text-sm shadow-2xs transition">
+                            ◀ -0.5 m
+                        </button>
+                        <span id="currentDistPill" class="px-3 py-2 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-xl font-mono-num font-bold text-xs sm:text-sm min-w-[72px] text-center">
+                            0.5 m
+                        </span>
+                        <button onclick="changeDistance(0.5)" id="btnPlus" class="px-2.5 py-2 bg-white hover:bg-slate-100 active:scale-95 disabled:opacity-40 border border-slate-300 rounded-xl font-bold text-slate-700 text-xs sm:text-sm shadow-2xs transition">
+                            +0.5 m ▶
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-1.5 flex-1 max-w-xs sm:max-w-sm">
+                        <button onclick="setDistance(0.5)" id="btnDist5" class="dist-preset-btn py-2 rounded-xl font-mono-num font-bold text-xs sm:text-sm border transition active:scale-95 bg-indigo-600 text-white border-indigo-600">0.5 m</button>
+                        <button onclick="setDistance(1.0)" id="btnDist10" class="dist-preset-btn py-2 rounded-xl font-mono-num font-bold text-xs sm:text-sm border transition active:scale-95 bg-white text-slate-700 border-slate-300 hover:bg-slate-100">1.0 m</button>
+                        <button onclick="setDistance(1.5)" id="btnDist15" class="dist-preset-btn py-2 rounded-xl font-mono-num font-bold text-xs sm:text-sm border transition active:scale-95 bg-white text-slate-700 border-slate-300 hover:bg-slate-100">1.5 m</button>
+                        <button onclick="setDistance(2.0)" id="btnDist20" class="dist-preset-btn py-2 rounded-xl font-mono-num font-bold text-xs sm:text-sm border transition active:scale-95 bg-white text-slate-700 border-slate-300 hover:bg-slate-100">2.0 m</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 우측: 스마트 기기 조도계 & 기록표 -->
+            <div class="col-span-12 md:col-span-4 bg-white rounded-2xl shadow-sm border border-slate-200 p-3.5 flex flex-col justify-between gap-2.5 min-h-0">
+                <div class="bg-slate-900 rounded-2xl p-3 border-2 border-slate-800 shadow-inner shrink-0">
+                    <div class="flex justify-between items-center text-[11px] text-slate-400 border-b border-slate-800 pb-1.5 mb-2">
+                        <span class="font-bold text-slate-300">📱 스마트 기기 조도 센서</span>
+                        <span id="sensorActiveDot" class="flex items-center gap-1 text-slate-500">
+                            <span id="sensorDotPulse" class="w-2 h-2 rounded-full bg-slate-600"></span> 대기중
+                        </span>
+                    </div>
+
+                    <div class="flex items-center justify-between bg-slate-950/90 rounded-xl px-3 py-1.5 mb-2 border border-slate-800">
+                        <span class="text-xs text-slate-400">현재 거리 (d)</span>
+                        <span id="phoneDistanceDisplay" class="font-mono-num font-bold text-sky-400 text-base">0.5 m</span>
+                    </div>
+
+                    <div class="text-center py-1">
+                        <div class="text-[11px] text-slate-400">빛의 세기 (I)</div>
+                        <div class="flex items-baseline justify-center gap-1">
+                            <span id="luxDisplay" class="font-mono-num font-black text-3xl sm:text-4xl text-slate-600 tracking-tight">0</span>
+                            <span class="font-mono-num font-bold text-sm text-amber-400">lx</span>
+                        </div>
+                    </div>
+
+                    <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mt-1.5">
+                        <div id="luxGaugeBar" class="bg-gradient-to-r from-amber-500 to-yellow-300 h-full w-0 transition-all duration-300"></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-1 gap-2 shrink-0">
+                    <button id="powerBtn" onclick="toggleBulbPower()" class="w-full py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm shadow transition active:scale-98 flex items-center justify-center gap-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 border border-amber-500">
+                        <span>🔌</span>
+                        <span id="powerBtnText">전구 전원 켜기 (ON)</span>
+                    </button>
+
+                    <button id="recordBtn" onclick="recordMeasurement()" disabled class="w-full py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm shadow transition active:scale-98 flex items-center justify-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white disabled:opacity-40 disabled:cursor-not-allowed">
+                        <span>📝</span>
+                        <span>현재 측정값 기록하기</span>
+                    </button>
+                </div>
+
+                <div class="flex-1 min-h-0 flex flex-col bg-slate-50 rounded-xl border border-slate-200 p-2.5 overflow-y-auto">
+                    <div class="flex items-center justify-between mb-1.5 shrink-0">
+                        <span class="text-xs font-bold text-slate-700">📌 구간별 측정 현황 (<span id="recordedCountText">0</span>/4)</span>
+                        <button onclick="switchTab(3)" id="goStep3Btn" class="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-0.5">
+                            <span>계산하러 가기</span>
+                            <span>▶</span>
+                        </button>
+                    </div>
+                    <div id="miniRecordGrid" class="grid grid-cols-2 gap-1.5 flex-1">
+                        <!-- JS 렌더링 -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =====================================================================
+             [3단계] 표 & 계산하기 탭
+             ===================================================================== -->
+        <section id="tabPanel3" class="tab-panel hidden flex-1 min-h-0 bg-white rounded-2xl shadow-sm border border-slate-200 p-3.5 sm:p-5 flex flex-col justify-between">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2.5 shrink-0">
+                <div>
+                    <h2 class="font-bold text-slate-800 text-base sm:text-lg flex items-center gap-2">
+                        <span>📊</span> 실험 결과 기록 및 계산하기
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-0.5">
+                        <span class="text-emerald-700 font-bold">① 거리의 제곱(d²)</span>은 직접 계산해 입력하고, 
+                        <span class="text-purple-700 font-bold">② 빛의 세기 × 거리의 제곱(I × d²)</span>은 버튼을 클릭해 계산해 보세요!
+                    </p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="fillSampleDataIfEmpty()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-xl text-xs font-bold transition">
+                        결과 자동 완성
+                    </button>
+                    <button onclick="switchTab(4)" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs sm:text-sm font-bold shadow transition flex items-center gap-1">
+                        <span>4단계: 그래프 확인</span>
+                        <span>▶</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-1 min-h-0 flex items-center justify-center my-2">
+                <div class="w-full overflow-x-auto border border-slate-200 rounded-2xl shadow-2xs">
+                    <table class="w-full text-center border-collapse table-fixed">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-800 text-xs sm:text-sm border-b border-slate-200">
+                                <th class="py-3 px-3 font-bold w-[20%]">
+                                    거리<br><span class="text-indigo-600 font-mono-num font-extrabold">d (m)</span>
+                                </th>
+                                <th class="py-3 px-3 font-bold w-[20%]">
+                                    빛의 세기<br><span class="text-amber-600 font-mono-num font-extrabold">I (lx)</span>
+                                </th>
+                                <th class="py-3 px-3 font-bold w-[30%] bg-emerald-50/70">
+                                    거리의 제곱 <span class="text-[11px] font-normal text-emerald-700">(직접입력)</span><br>
+                                    <span class="text-emerald-700 font-mono-num font-extrabold">d² (m²)</span>
+                                </th>
+                                <th class="py-3 px-3 font-bold w-[30%] bg-purple-50/70">
+                                    빛 세기×거리² <span class="text-[11px] font-normal text-purple-700">(버튼클릭)</span><br>
+                                    <span class="text-purple-700 font-mono-num font-extrabold">I × d²</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="calcTableBody" class="divide-y divide-slate-200 text-sm sm:text-base">
+                            <!-- JS 렌더링 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-3 flex flex-wrap items-center justify-between gap-2 shrink-0">
+                <div class="flex items-center gap-2 text-xs sm:text-sm text-indigo-950">
+                    <span class="text-lg">💡</span>
+                    <span><b>규칙 찾기 포인트:</b> 거리가 <b>0.5m → 1.0m(2배)</b>, <b>0.5m → 2.0m(4배)</b>로 늘어날 때, <b>빛의 세기(I)</b>와 <b>I × d²</b> 값은 어떻게 변하나요?</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- =====================================================================
+             [4단계] 그래프 탭 (기존 탭 분리)
+             ===================================================================== -->
+        <section id="tabPanel4" class="tab-panel hidden flex-1 min-h-0 flex flex-col gap-3 sm:gap-4 p-1">
+            <div class="flex items-center justify-between shrink-0 px-2 pt-2">
+                <h2 class="font-bold text-slate-800 text-base sm:text-lg flex items-center gap-2">
+                    <span>📈</span> 측정 결과 그래프 확인
+                </h2>
+                <button onclick="switchTab(5)" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs sm:text-sm font-bold shadow transition flex items-center gap-1">
+                    <span>5단계: 원리 정리 & 퀴즈</span>
+                    <span>▶</span>
+                </button>
+            </div>
+            
+            <div class="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 pb-2">
+                <!-- 그래프 1 -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-3 flex flex-col min-h-0">
+                    <div class="flex items-center justify-between mb-1 shrink-0">
+                        <h3 class="font-bold text-slate-800 text-xs sm:text-sm flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                            <span>그래프 1. 거리(d)와 빛의 세기(I)</span>
+                        </h3>
+                    </div>
+                    <div class="flex-1 min-h-0 relative bg-slate-50 rounded-xl border border-slate-200" id="graph1Container">
+                        <canvas id="graph1Canvas" class="w-full h-full block"></canvas>
+                    </div>
+                </div>
+
+                <!-- 그래프 2 -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-3 flex flex-col min-h-0">
+                    <div class="flex items-center justify-between mb-1 shrink-0">
+                        <h3 class="font-bold text-slate-800 text-xs sm:text-sm flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-purple-600"></span>
+                            <span>그래프 2. 거리(d)에 따른 I × d² 값의 변화</span>
+                        </h3>
+                    </div>
+                    <div class="flex-1 min-h-0 relative bg-slate-50 rounded-xl border border-slate-200" id="graph2Container">
+                        <canvas id="graph2Canvas" class="w-full h-full block"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =====================================================================
+             [5단계] 정리 & 문제 탭 (기존 탭 분리)
+             ===================================================================== -->
+        <section id="tabPanel5" class="tab-panel hidden flex-1 min-h-0 overflow-y-auto p-2 sm:p-4 flex flex-col items-center">
+            <div class="w-full max-w-3xl flex flex-col gap-4">
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-950 leading-relaxed shadow-sm">
+                    <div class="font-bold text-amber-900 mb-1.5 flex items-center gap-1 text-base">
+                        <span>✨</span> 오늘의 실험 결론
+                    </div>
+                    빛은 사방으로 퍼지므로 <b>빛의 세기(I)는 거리의 제곱(d²)에 반비례</b>하며, <b>빛의 세기 × 거리의 제곱(I × d²) 값은 (약간의 측정 오차를 제외하면) 항상 일정</b>합니다.
+                </div>
+
+                <!-- 퀴즈 1 -->
+                <div class="bg-white rounded-2xl shadow-sm p-4 sm:p-5 border border-slate-200 space-y-3">
+                    <div class="flex items-start gap-2">
+                        <span class="bg-indigo-600 text-white text-xs font-bold px-2.5 py-0.5 rounded shrink-0 mt-0.5">Q1</span>
+                        <p class="font-bold text-slate-800 text-sm sm:text-base leading-snug">
+                            전구로부터의 거리가 0.5 m에서 1.0 m로 <b>2배</b> 멀어지면, 빛의 세기는 처음의 몇 배가 되나요?
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="checkQuiz(1, 'wrong', this)" class="quiz-btn-1 py-2 px-3 bg-slate-50 hover:bg-slate-100 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 transition text-left">① 1/2배가 된다</button>
+                        <button onclick="checkQuiz(1, 'correct', this)" class="quiz-btn-1 py-2 px-3 bg-slate-50 hover:bg-slate-100 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 transition text-left">② 1/4배가 된다</button>
+                        <button onclick="checkQuiz(1, 'wrong', this)" class="quiz-btn-1 py-2 px-3 bg-slate-50 hover:bg-slate-100 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 transition text-left">③ 2배가 된다</button>
+                        <button onclick="checkQuiz(1, 'wrong', this)" class="quiz-btn-1 py-2 px-3 bg-slate-50 hover:bg-slate-100 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 transition text-left">④ 변함없이 일정하다</button>
+                    </div>
+                    <div id="quizFeedback1" class="hidden text-xs p-3 rounded-lg leading-snug"></div>
+                </div>
+
+                <!-- 퀴즈 2 -->
+                <div class="bg-white rounded-2xl shadow-sm p-4 sm:p-5 border border-slate-200 space-y-3">
+                    <div class="flex items-start gap-2">
+                        <span class="bg-emerald-600 text-white text-xs font-bold px-2.5 py-0.5 rounded shrink-0 mt-0.5">Q2</span>
+                        <p class="font-bold text-slate-800 text-sm sm:text-base leading-snug">
+                            [실생활 적용] 밤에 멀리서 다가오는 자동차의 전조등(헤드라이트)이 처음보다 <b>2배 가까운 거리</b>까지 다가왔을 때, 우리 눈에 들어오는 빛의 세기는 어떻게 변할까요?
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="checkQuiz(2, 'wrong', this)" class="quiz-btn-2 py-2 px-3 bg-slate-50 hover:bg-slate-100 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 transition text-left">① 2배 밝아진다</button>
+                        <button onclick="checkQuiz(2, 'correct', this)" class="quiz-btn-2 py-2 px-3 bg-slate-50 hover:bg-slate-100 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 transition text-left">② 4배 밝아진다</button>
+                        <button onclick="checkQuiz(2, 'wrong', this)" class="quiz-btn-2 py-2 px-3 bg-slate-50 hover:bg-slate-100 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 transition text-left">③ 1/2배 어두워진다</button>
+                        <button onclick="checkQuiz(2, 'wrong', this)" class="quiz-btn-2 py-2 px-3 bg-slate-50 hover:bg-slate-100 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 transition text-left">④ 1/4배 어두워진다</button>
+                    </div>
+                    <div id="quizFeedback2" class="hidden text-xs p-3 rounded-lg leading-snug"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        /**
+         * ============================================================================
+         * 1. 전역 상태 변수 및 물리 모델 설정
+         * ============================================================================
+         */
+        const DISTANCES = [0.5, 1.0, 1.5, 2.0];
+        const LUMINOUS_CONSTANT = 900; // 0.5m->3600lx, 1.0m->900lx
+        
+        let currentTab = 1;
+        let isBulbOn = false;
+        let currentDist = 0.5;
+        let currentDisplayLux = 0; // 측정 시마다 바뀌는 (오차 포함) 조도값 캐싱용
+        let measurements = { 0.5: null, 1.0: null, 1.5: null, 2.0: null };
+        let verifiedD2 = { 0.5: false, 1.0: false, 1.5: false, 2.0: false }; // d² 값 확인 상태 저장
+
+        let isDragging = false;
+
+        /**
+         * ============================================================================
+         * 2. 초기화 및 이벤트 등록
+         * ============================================================================
+         */
+        window.addEventListener('DOMContentLoaded', () => {
+            switchTab(1);
+            setupCanvasDrag();
+            window.addEventListener('resize', handleResize);
+        });
+
+        function handleResize() {
+            if (currentTab === 2) drawLab();
+            if (currentTab === 4) {
+                drawGraph1();
+                drawGraph2();
+            }
+        }
+
+        /**
+         * ============================================================================
+         * 3. 탭 전환 로직
+         * ============================================================================
+         */
+        function switchTab(tabId) {
+            currentTab = tabId;
+            
+            document.querySelectorAll('.tab-panel').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tabPanel${tabId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+                let badge = document.getElementById(`tabBadge${idx + 1}`);
+                if (!badge) return; // 탭 개수가 맞지 않을 경우 에러 방지
+                
+                if (idx + 1 === tabId) {
+                    btn.className = "tab-btn px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-indigo-600 text-white shadow";
+                    badge.className = "w-4 h-4 rounded-full bg-white/20 text-[11px] flex items-center justify-center";
+                } else {
+                    btn.className = "tab-btn px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white";
+                    badge.className = "w-4 h-4 rounded-full bg-slate-700 text-[11px] flex items-center justify-center";
+                }
+            });
+
+            if (tabId === 2) {
+                updateUI();
+                drawLab();
+            } else if (tabId === 3) {
+                renderCalcTable();
+            } else if (tabId === 4) {
+                setTimeout(() => {
+                    drawGraph1();
+                    drawGraph2();
+                }, 50);
+            }
+        }
+
+        /**
+         * ============================================================================
+         * 4. 토스트 알림
+         * ============================================================================
+         */
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            const bgColor = type === 'success' ? 'bg-indigo-600' : (type === 'error' ? 'bg-rose-500' : 'bg-slate-700');
+            toast.className = `toast-enter flex items-center px-4 py-2.5 rounded-xl shadow-lg text-white text-sm font-bold ${bgColor}`;
+            toast.innerHTML = `<span>${message}</span>`;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.replace('toast-enter', 'toast-leave');
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+
+        /**
+         * ============================================================================
+         * 5. 가상 실험실 제어 (거리/전원)
+         * ============================================================================
+         */
+        function generateLuxWithRandomError(d) {
+            const exact = LUMINOUS_CONSTANT / (d * d);
+            // +- 1%의 무작위 측정 오차 적용 (실제 실험 환경과 유사하지만 편차 축소)
+            const variance = exact * 0.01;
+            const error = (Math.random() * 2 - 1) * variance;
+            return Math.round(exact + error);
+        }
+
+        function updateUI() {
+            document.getElementById('currentDistPill').innerText = currentDist.toFixed(1) + ' m';
+            document.getElementById('phoneDistanceDisplay').innerText = currentDist.toFixed(1) + ' m';
+            
+            document.getElementById('btnMinus').disabled = currentDist <= 0.5;
+            document.getElementById('btnPlus').disabled = currentDist >= 2.0;
+
+            DISTANCES.forEach(d => {
+                const btn = document.getElementById(`btnDist${d * 10}`);
+                if (btn) {
+                    if (d === currentDist) {
+                        btn.className = "dist-preset-btn py-2 rounded-xl font-mono-num font-bold text-xs sm:text-sm border transition active:scale-95 bg-indigo-600 text-white border-indigo-600";
+                    } else {
+                        btn.className = "dist-preset-btn py-2 rounded-xl font-mono-num font-bold text-xs sm:text-sm border transition active:scale-95 bg-white text-slate-700 border-slate-300 hover:bg-slate-100";
+                    }
+                }
+            });
+
+            const lux = isBulbOn ? currentDisplayLux : 0;
+            const luxDisplay = document.getElementById('luxDisplay');
+            luxDisplay.innerText = lux.toLocaleString();
+            luxDisplay.className = `font-mono-num font-black text-3xl sm:text-4xl tracking-tight ${isBulbOn ? 'text-amber-500' : 'text-slate-600'}`;
+            
+            const maxLux = 3600; 
+            let percent = isBulbOn ? (lux / maxLux) * 100 : 0;
+            document.getElementById('luxGaugeBar').style.width = `${percent}%`;
+
+            const recordBtn = document.getElementById('recordBtn');
+            recordBtn.disabled = !(isBulbOn && DISTANCES.includes(currentDist));
+
+            renderMiniRecordGrid();
+            drawLab();
+        }
+
+        function changeDistance(delta) {
+            let nextDist = currentDist + delta;
+            nextDist = Math.round(nextDist * 2) / 2;
+            if (nextDist >= 0.5 && nextDist <= 2.0) {
+                setDistance(nextDist);
+            }
+        }
+
+        function setDistance(dist) {
+            if (currentDist !== dist) {
+                currentDist = dist;
+                if (isBulbOn) {
+                    currentDisplayLux = generateLuxWithRandomError(currentDist);
+                }
+            }
+            updateUI();
+        }
+
+        function toggleBulbPower() {
+            isBulbOn = !isBulbOn;
+            
+            if (isBulbOn) {
+                currentDisplayLux = generateLuxWithRandomError(currentDist);
+            }
+
+            const powerBtn = document.getElementById('powerBtn');
+            const powerBtnText = document.getElementById('powerBtnText');
+            const badge = document.getElementById('bulbStatusBadge');
+            const dot = document.getElementById('sensorDotPulse');
+
+            if (isBulbOn) {
+                powerBtn.className = "w-full py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm shadow transition active:scale-98 flex items-center justify-center gap-1.5 bg-rose-600 hover:bg-rose-500 text-white border border-rose-700";
+                powerBtnText.innerText = "전구 끄기 (OFF)";
+                badge.innerText = "전구 상태: ON (켜짐)";
+                badge.className = "px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/50 shadow-[0_0_10px_rgba(251,191,36,0.3)]";
+                dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_5px_#34d399]";
+                dot.nextSibling.textContent = " 측정중";
+            } else {
+                powerBtn.className = "w-full py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm shadow transition active:scale-98 flex items-center justify-center gap-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 border border-amber-500";
+                powerBtnText.innerText = "전구 켜기 (ON)";
+                badge.innerText = "전구 상태: OFF (꺼짐)";
+                badge.className = "px-2.5 py-1 rounded-full text-xs font-bold bg-slate-800/90 text-slate-400 border border-slate-700";
+                dot.className = "w-2 h-2 rounded-full bg-slate-600";
+                dot.nextSibling.textContent = " 대기중";
+            }
+            updateUI();
+        }
+
+        /**
+         * ============================================================================
+         * 6. 측정 기록 및 UI 렌더링
+         * ============================================================================
+         */
+        function recordMeasurement() {
+            if (!isBulbOn) return;
+            const lux = currentDisplayLux;
+            measurements[currentDist] = lux;
+            updateUI();
+            showToast(`${currentDist.toFixed(1)}m 위치의 빛의 세기(${lux} lx)가 기록되었습니다.`);
+        }
+
+        function fillSampleDataIfEmpty() {
+            let filled = false;
+            DISTANCES.forEach(d => {
+                if (measurements[d] === null) {
+                    measurements[d] = generateLuxWithRandomError(d);
+                    filled = true;
+                }
+            });
+            
+            if (filled) {
+                showToast("남은 측정값이 자동으로 완성되었습니다.");
+            } else {
+                showToast("이미 모든 데이터가 기록되어 있습니다.", "error");
+            }
+            
+            if(currentTab === 2) renderMiniRecordGrid();
+            if(currentTab === 3) renderCalcTable();
+        }
+
+        function resetAllExperiment() {
+            isBulbOn = false;
+            currentDist = 0.5;
+            currentDisplayLux = 0;
+            measurements = { 0.5: null, 1.0: null, 1.5: null, 2.0: null };
+            verifiedD2 = { 0.5: false, 1.0: false, 1.5: false, 2.0: false };
+            switchTab(1);
+            showToast("실험이 초기화되었습니다.");
+        }
+
+        function renderMiniRecordGrid() {
+            const grid = document.getElementById('miniRecordGrid');
+            if(!grid) return;
+            grid.innerHTML = '';
+            let count = 0;
+
+            DISTANCES.forEach(d => {
+                const val = measurements[d];
+                const div = document.createElement('div');
+                div.className = `rounded border p-1.5 flex flex-col justify-center items-center text-center ${val !== null ? 'bg-indigo-50 border-indigo-200' : 'bg-white border-slate-200'}`;
+                
+                let html = `<span class="text-[10px] text-slate-500 font-bold">${d.toFixed(1)} m</span>`;
+                if (val !== null) {
+                    html += `<span class="text-xs font-mono-num font-black text-indigo-700">${val.toLocaleString()} lx</span>`;
+                    count++;
+                } else {
+                    html += `<span class="text-[10px] text-slate-400">-</span>`;
+                }
+                div.innerHTML = html;
+                grid.appendChild(div);
+            });
+
+            document.getElementById('recordedCountText').innerText = count;
+        }
+
+        function renderCalcTable() {
+            const tbody = document.getElementById('calcTableBody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+
+            DISTANCES.forEach(d => {
+                const lux = measurements[d];
+                const isRecorded = lux !== null;
+                const tr = document.createElement('tr');
+                
+                let td1 = `<td class="py-2.5 px-2 font-mono-num font-bold text-slate-700">${d.toFixed(1)}</td>`;
+                let td2 = `<td class="py-2.5 px-2 font-mono-num font-bold ${isRecorded ? 'text-amber-600' : 'text-slate-400'}">${isRecorded ? lux.toLocaleString() : '-'}</td>`;
+                
+                // 입력창과 확인 버튼 추가
+                let td3 = `<td class="py-2 px-2 text-center">
+                    <div class="flex items-center justify-center gap-1">
+                        <input type="number" step="0.01" id="d2_input_${d * 10}" 
+                            class="w-14 sm:w-20 text-center font-mono-num font-bold text-sm border rounded py-1 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-100 ${verifiedD2[d] ? 'bg-emerald-100 border-emerald-500 text-emerald-800' : 'bg-white border-emerald-300 text-emerald-800'}" 
+                            placeholder="?" 
+                            ${verifiedD2[d] ? `value="${d*d}" disabled` : ''}>
+                        <button onclick="checkD2Value(this, ${d})" id="d2_btn_${d * 10}" 
+                            class="px-2 py-1 rounded text-[11px] sm:text-xs font-bold transition whitespace-nowrap ${verifiedD2[d] ? 'bg-emerald-400 text-white cursor-default' : 'bg-emerald-600 hover:bg-emerald-500 text-white active:scale-95'}"
+                            ${verifiedD2[d] ? 'disabled' : ''}>
+                            ${verifiedD2[d] ? '완료' : '확인'}
+                        </button>
+                    </div>
+                </td>`;
+                
+                let td4 = `<td class="py-2 px-2 text-center">
+                    ${isRecorded 
+                        ? `<button onclick="calculateIxD2(this, ${lux}, ${d})" class="px-2.5 py-1 bg-purple-600 hover:bg-purple-500 text-white rounded text-[11px] sm:text-xs font-bold transition active:scale-95 whitespace-nowrap">계산</button>` 
+                        : `<span class="text-[11px] text-slate-400">먼저 측정하세요</span>`
+                    }
+                </td>`;
+
+                tr.innerHTML = td1 + td2 + td3 + td4;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function checkD2Value(btn, d) {
+            const expectedVal = d * d;
+            const inputId = `d2_input_${d * 10}`;
+            const input = document.getElementById(inputId);
+            const userVal = parseFloat(input.value);
+
+            if (isNaN(userVal)) {
+                showToast("계산한 값을 입력해주세요.", "error");
+                return;
+            }
+
+            // 부동소수점 오차 감안하여 비교 (0.01 미만 차이는 정답으로 인정)
+            if (Math.abs(userVal - expectedVal) < 0.01) {
+                showToast(`${d.toFixed(1)}m 거리의 제곱 값을 정확히 계산했습니다! 🎉`);
+                verifiedD2[d] = true;
+                
+                // UI 즉시 업데이트
+                input.value = expectedVal; // 깔끔하게 정답으로 맞춰줌
+                input.disabled = true;
+                input.classList.remove('bg-white', 'border-emerald-300');
+                input.classList.add('bg-emerald-100', 'border-emerald-500');
+                
+                btn.innerText = "완료";
+                btn.disabled = true;
+                btn.classList.replace('bg-emerald-600', 'bg-emerald-400');
+                btn.classList.remove('hover:bg-emerald-500', 'active:scale-95');
+            } else {
+                showToast("틀렸습니다. 거리(d)를 두 번 곱해보세요.", "error");
+                input.value = "";
+                input.focus();
+            }
+        }
+
+        function calculateIxD2(btn, I, d) {
+            const result = Math.round(I * (d * d));
+            const td = btn.parentElement;
+            td.innerHTML = `<span class="font-mono-num font-black text-purple-700 text-sm sm:text-base animate-pulse">${result.toLocaleString()}</span>`;
+            showToast(`${d.toFixed(1)}m 에서의 곱을 계산했습니다.`);
+        }
+
+        /**
+         * ============================================================================
+         * 7. Canvas 가상 실험실 시각화
+         * ============================================================================
+         */
+        const labCanvas = document.getElementById('labCanvas');
+        const ctx = labCanvas.getContext('2d');
+
+        function drawLab() {
+            if (currentTab !== 2) return;
+            const container = document.getElementById('labContainer');
+            const dpr = window.devicePixelRatio || 1;
+            const rect = container.getBoundingClientRect();
+            
+            labCanvas.width = rect.width * dpr;
+            labCanvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            
+            const w = rect.width;
+            const h = rect.height;
+
+            ctx.fillStyle = '#020617';
+            ctx.fillRect(0, 0, w, h);
+
+            const floorY = h - 30;
+            
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, floorY);
+            ctx.lineTo(w, floorY);
+            ctx.stroke();
+
+            const phoneX = w - 60;
+            const pxPerMeter = (w - 120) / 2.0; 
+            
+            ctx.fillStyle = '#475569';
+            ctx.textAlign = 'center';
+            ctx.font = '10px "JetBrains Mono"';
+            for(let d = 0; d <= 2.0; d += 0.5) {
+                const tx = phoneX - (d * pxPerMeter);
+                ctx.fillRect(tx - 1, floorY, 2, 8);
+                ctx.fillText(d.toFixed(1) + 'm', tx, floorY + 20);
+            }
+
+            const bulbX = phoneX - (currentDist * pxPerMeter);
+            const bulbY = floorY - 50;
+
+            drawPhone(phoneX, floorY);
+
+            const showRays = document.getElementById('showRaysToggle').checked;
+            if (isBulbOn && showRays) {
+                drawLightRays(bulbX, bulbY, phoneX, floorY);
+            }
+
+            drawBulb(bulbX, bulbY, isBulbOn);
+        }
+
+        function drawPhone(x, floorY) {
+            const py = floorY - 35;
+            ctx.fillStyle = '#334155';
+            ctx.fillRect(x - 5, py + 30, 10, 5);
+            ctx.fillStyle = '#cbd5e1';
+            ctx.beginPath();
+            ctx.roundRect(x - 12, py - 30, 24, 60, 4);
+            ctx.fill();
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(x - 10, py - 25, 20, 50);
+            ctx.fillStyle = isBulbOn ? '#34d399' : '#475569';
+            ctx.beginPath();
+            ctx.arc(x, py - 18, 3, 0, Math.PI * 2);
+            ctx.fill();
+            if(isBulbOn) {
+                ctx.shadowColor = '#34d399';
+                ctx.shadowBlur = 5;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        function drawBulb(x, y, isOn) {
+            ctx.fillStyle = '#475569';
+            ctx.fillRect(x - 3, y + 15, 6, 35);
+            ctx.fillRect(x - 12, y + 50, 24, 5);
+
+            ctx.beginPath();
+            ctx.arc(x, y, 15, 0, Math.PI * 2);
+            if (isOn) {
+                ctx.fillStyle = '#fbbf24';
+                ctx.shadowColor = '#f59e0b';
+                ctx.shadowBlur = 20;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#fef08a';
+                ctx.beginPath();
+                ctx.arc(x, y, 8, 0, Math.PI * 2);
+                ctx.fill();
+            } else {
+                ctx.fillStyle = '#64748b';
+                ctx.fill();
+            }
+            
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillRect(x - 8, y + 12, 16, 8);
+        }
+
+        function drawLightRays(bx, by, px, floorY) {
+            ctx.save();
+            ctx.strokeStyle = 'rgba(251, 191, 36, 0.4)';
+            ctx.lineWidth = 1;
+            
+            const maxRays = 30;
+            for(let i=0; i<maxRays; i++) {
+                const angle = (Math.PI * 2 / maxRays) * i;
+                const length = 500;
+                const endX = bx + Math.cos(angle) * length;
+                const endY = by + Math.sin(angle) * length;
+                
+                if(Math.sin(angle) > 0) {
+                   const t = (floorY - by) / (endY - by);
+                   if (t < 1 && t > 0) {
+                       ctx.beginPath();
+                       ctx.moveTo(bx, by);
+                       ctx.lineTo(bx + Math.cos(angle) * length * t, floorY);
+                       ctx.stroke();
+                       continue;
+                   }
+                }
+                ctx.beginPath();
+                ctx.moveTo(bx, by);
+                ctx.lineTo(endX, endY);
+                ctx.stroke();
+            }
+
+            ctx.strokeStyle = 'rgba(251, 191, 36, 0.8)';
+            ctx.setLineDash([5, 5]);
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(bx, by);
+            ctx.lineTo(px, floorY - 53);
+            ctx.stroke();
+            
+            ctx.restore();
+        }
+
+        function setupCanvasDrag() {
+            labCanvas.addEventListener('mousedown', startDrag);
+            labCanvas.addEventListener('touchstart', startDrag, {passive: false});
+            
+            window.addEventListener('mousemove', onDrag);
+            window.addEventListener('touchmove', onDrag, {passive: false});
+            
+            window.addEventListener('mouseup', endDrag);
+            window.addEventListener('touchend', endDrag);
+        }
+
+        function startDrag(e) {
+            if (currentTab !== 2) return;
+            isDragging = true;
+            onDrag(e);
+        }
+
+        function onDrag(e) {
+            if (!isDragging || currentTab !== 2) return;
+            if (e.cancelable) e.preventDefault(); 
+
+            const rect = labCanvas.getBoundingClientRect();
+            let clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            
+            const x = clientX - rect.left;
+            const w = rect.width;
+            
+            const phoneX = w - 60;
+            const pxPerMeter = (w - 120) / 2.0;
+            
+            let rawDist = (phoneX - x) / pxPerMeter;
+            let snapDist = Math.round(rawDist * 2) / 2;
+            snapDist = Math.max(0.5, Math.min(2.0, snapDist));
+            
+            if (snapDist !== currentDist) {
+                currentDist = snapDist;
+                if (isBulbOn) currentDisplayLux = generateLuxWithRandomError(currentDist);
+                updateUI();
+            }
+        }
+
+        function endDrag() {
+            isDragging = false;
+        }
+
+        /**
+         * ============================================================================
+         * 8. 캔버스 그래프 그리기
+         * ============================================================================
+         */
+        function drawGraph1() {
+            const canvas = document.getElementById('graph1Canvas');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.parentElement.getBoundingClientRect();
+            
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            
+            const w = rect.width;
+            const h = rect.height;
+            const pad = 35;
+
+            ctx.clearRect(0, 0, w, h);
+
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(pad, pad);
+            ctx.lineTo(pad, h - pad); 
+            ctx.lineTo(w - pad, h - pad); 
+            ctx.stroke();
+
+            ctx.fillStyle = '#475569';
+            ctx.font = '10px "Noto Sans KR"';
+            ctx.textAlign = 'center';
+            ctx.fillText('거리 d (m)', w / 2, h - 5);
+            
+            ctx.save();
+            ctx.translate(12, h / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText('빛의 세기 I (lx)', 0, 0);
+            ctx.restore();
+
+            const maxI = 3600; 
+            const maxD = 2.5;
+
+            ctx.strokeStyle = '#f59e0b';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            for(let d = 0.5; d <= 2.2; d += 0.1) {
+                const I = LUMINOUS_CONSTANT / (d * d);
+                const x = pad + (d / maxD) * (w - pad * 2);
+                const y = (h - pad) - (I / maxI) * (h - pad * 2);
+                if (d === 0.5) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            ctx.fillStyle = '#ea580c';
+            DISTANCES.forEach(d => {
+                const I = measurements[d] || (LUMINOUS_CONSTANT / (d*d));
+                const x = pad + (d / maxD) * (w - pad * 2);
+                const y = (h - pad) - (I / maxI) * (h - pad * 2);
+                
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#334155';
+                ctx.font = '9px "JetBrains Mono"';
+                ctx.fillText(`${I}lx`, x + 12, y - 5);
+                ctx.fillStyle = '#ea580c';
+            });
+        }
+
+        function drawGraph2() {
+            const canvas = document.getElementById('graph2Canvas');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.parentElement.getBoundingClientRect();
+            
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            
+            const w = rect.width;
+            const h = rect.height;
+            const pad = 35;
+
+            ctx.clearRect(0, 0, w, h);
+
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(pad, pad);
+            ctx.lineTo(pad, h - pad); 
+            ctx.lineTo(w - pad, h - pad); 
+            ctx.stroke();
+
+            ctx.fillStyle = '#475569';
+            ctx.font = '10px "Noto Sans KR"';
+            ctx.textAlign = 'center';
+            ctx.fillText('거리 d (m)', w / 2, h - 5);
+            
+            ctx.save();
+            ctx.translate(12, h / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText('I × d²', 0, 0);
+            ctx.restore();
+
+            const maxD = 2.5;
+            const targetVal = LUMINOUS_CONSTANT;
+            const maxVal = targetVal * 2;
+
+            // 오차가 없을 때 완벽히 일정한 기준선(가이드 라인)
+            const yPosRef = (h - pad) - (targetVal / maxVal) * (h - pad * 2);
+            ctx.strokeStyle = 'rgba(124, 58, 237, 0.3)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(pad + (0.5 / maxD) * (w - pad * 2), yPosRef);
+            ctx.lineTo(pad + (2.2 / maxD) * (w - pad * 2), yPosRef);
+            ctx.stroke();
+
+            // 실제 측정값(오차 포함)을 연결한 꺾은선 그래프
+            ctx.strokeStyle = '#7c3aed';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            DISTANCES.forEach((d, i) => {
+                const I = measurements[d] || targetVal / (d*d);
+                const val = I * (d * d);
+                const x = pad + (d / maxD) * (w - pad * 2);
+                const y = (h - pad) - (val / maxVal) * (h - pad * 2);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+
+            // 각 측정 위치의 점찍기
+            ctx.fillStyle = '#6d28d9';
+            DISTANCES.forEach(d => {
+                const I = measurements[d] || targetVal / (d*d);
+                const val = I * (d * d);
+                const x = pad + (d / maxD) * (w - pad * 2);
+                const y = (h - pad) - (val / maxVal) * (h - pad * 2);
+
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#334155';
+                ctx.font = '9px "JetBrains Mono"';
+                ctx.fillText(`${Math.round(val)}`, x, y - 8);
+                ctx.fillStyle = '#6d28d9';
+            });
+        }
+
+        /**
+         * ============================================================================
+         * 9. 퀴즈 확인 로직
+         * ============================================================================
+         */
+        function checkQuiz(quizNum, resultString, btnElement) {
+            const isCorrect = (resultString === 'correct');
+            
+            const btns = document.querySelectorAll(`.quiz-btn-${quizNum}`);
+            btns.forEach(b => {
+                b.classList.remove('bg-rose-50', 'border-rose-400', 'text-rose-700', 'bg-emerald-50', 'border-emerald-400', 'text-emerald-700');
+            });
+
+            const feedback = document.getElementById(`quizFeedback${quizNum}`);
+            feedback.classList.remove('hidden');
+
+            if (isCorrect) {
+                btnElement.classList.add('bg-emerald-50', 'border-emerald-400', 'text-emerald-700');
+                feedback.className = "text-[11px] p-2 rounded-lg leading-snug bg-emerald-100 text-emerald-800 border border-emerald-200 mt-2 block";
+                if(quizNum === 1) {
+                    feedback.innerHTML = "<b>정답입니다! 🎉</b> 거리가 2배 멀어지면 거리의 제곱(2²)인 4배만큼 면적이 넓어지므로, 빛의 세기는 <b>1/4배</b>가 됩니다.";
+                } else {
+                    feedback.innerHTML = "<b>정답입니다! 🎉</b> 거리가 1/2배(2배 가깝게)가 되면 거리의 제곱인 (1/2)² = 1/4이 분모에 들어가므로, 빛의 세기는 <b>4배</b> 밝아집니다.";
+                }
+            } else {
+                btnElement.classList.add('bg-rose-50', 'border-rose-400', 'text-rose-700');
+                feedback.className = "text-[11px] p-2 rounded-lg leading-snug bg-rose-100 text-rose-800 border border-rose-200 mt-2 block";
+                feedback.innerHTML = "<b>오답입니다. 🥲</b> 빛의 세기 공식을 다시 생각해 보세요. 빛의 세기는 '거리의 제곱'에 반비례합니다.";
+            }
+        }
+    </script>
+</body>
+</html>
